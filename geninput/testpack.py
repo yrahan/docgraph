@@ -46,7 +46,7 @@ inputpath = os.path.abspath(os.path.join(
 # cleaning input directory
 erase_folder_s_files(inputpath)
 # define file types extensions
-file_type = {'app': 'jcl', 'job': 'jcl', 'proc': 'sql', }
+file_type = {'app': 'txt', 'job': 'txt', 'proc': 'txt', }
 # create database list
 db_names = []
 for i in range(10):
