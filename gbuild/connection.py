@@ -19,7 +19,7 @@ apps = [n for n in filenames if 'app' in n]
 # generating the dot file
 G = pgv.AGraph(stric=False, directed=True)
 # adding nodes
-procs = ['a', 'b']
+procs = [p.replace('.txt', '') for p in procs]
 for p in procs:
     G.add_node(p)
 # setting layout
