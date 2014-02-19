@@ -23,10 +23,9 @@ for p in procs:
     G.add_node(p)
 # setting layout
 G.layout(prog='dot')
+# saving dot file
+G.write(os.path.jon(outputpath, 'graph.dot'))
 # drawing
-<<<<<<< HEAD
 # G.draw(os.path.join(outputpath, 'graph.png'))
 G.draw(os.path.join(outputpath, 'graph.ps'), prog='circo')
-=======
 G.draw(os.path.join(outputpath, 'graph.png'))
->>>>>>> 9280eb3c64650fea07b17296a534e6264c978dbf
