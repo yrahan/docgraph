@@ -1,5 +1,7 @@
 import os
 
+from config import inputpath, db_names
+
 
 # make valid conection
 def connect_db_to_proc(db_id, proc_id):
@@ -77,17 +79,10 @@ def create_3_type_of_file_sets():
     create_file_set(size, inputpath, name_base, extention)
 
 
-# directory of input files
-inputpath = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), '..', 'input'))
 # cleaning input directory
 erase_folder_s_files(inputpath)
 # define file types extensions
 file_type = {'app': 'txt', 'job': 'txt', 'proc': 'txt', }
-# create database list
-db_names = []
-for i in range(10):
-    db_names.append("{}{}".format("db", i))
 # write list into a text file
 with open(os.path.join(inputpath, 'db.txt'), 'w') as f:
     for db in db_names:

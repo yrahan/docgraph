@@ -24,5 +24,5 @@ for p in procs:
 # setting layout
 G.layout(prog='dot')
 # drawing
-G.draw(os.path.join(outputpath, 'graph.png'))
+# G.draw(os.path.join(outputpath, 'graph.png'))
 G.draw(os.path.join(outputpath, 'graph.ps'), prog='circo')
