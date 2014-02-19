@@ -19,12 +19,13 @@ apps = [n for n in filenames if 'app' in n]
 # generating the dot file
 G = pgv.AGraph(stric=False, directed=True)
 # adding nodes
+procs = ['a', 'b']
 for p in procs:
     G.add_node(p)
 # setting layout
 G.layout(prog='dot')
 # saving dot file
-G.write(os.path.jon(outputpath, 'graph.dot'))
+G.write(os.path.join(outputpath, 'graph.dot'))
 # drawing
 # G.draw(os.path.join(outputpath, 'graph.png'))
 G.draw(os.path.join(outputpath, 'graph.ps'), prog='circo')
