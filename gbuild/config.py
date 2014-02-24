@@ -6,7 +6,7 @@ inputpath = os.path.abspath(os.path.join(
 # directory of input files
 outputpath = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', 'output'))
-# create database list
-db_names = []
+# create datanamesbase list
+datanames = []
 for i in range(10):
-    db_names.append("{}{}".format("db", i))
+    datanames.append("{}.{}".format("data", i))
