@@ -10,23 +10,30 @@ filenames.remove("db.txt")
 lines = {}
 for name in filenames:
     with open(os.path.join(inputpath, name), 'r') as f:
-        lines[name] = f.read().splitlines()
+        lines[name.replace('.txt', '')] = f.read().splitlines()
 # loading informations into dictionnaries
+filenames = [f.replace('.txt', '') for f in filenames]
 procs = [n for n in filenames if 'proc' in n]
 jobs = [n for n in filenames if 'job' in n]
 apps = [n for n in filenames if 'app' in n]
-
+print lines
 # generating the dot file
 G = pgv.AGraph(stric=False, directed=True)
 # adding nodes
-procs = [p.replace('.txt', '') for p in procs]
+# entry point = proc52
+child = 'proc52'
+procs.remove(child)
+G.add_node(child)
 for p in procs:
-    G.add_node(p)
+    if any(child in line for line in lines[p]):
+
+
+   G.add_node(p)
 # setting layout
 G.layout(prog='dot')
 # saving dot file
 G.write(os.path.join(outputpath, 'graph.dot'))
 # drawing
 # G.draw(os.path.join(outputpath, 'graph.png'))
-G.draw(os.path.join(outputpath, 'graph.ps'), prog='circo')
+G.draw(os.path.join(outputpath, 'graph.ps'))
 G.draw(os.path.join(outputpath, 'graph.png'))
