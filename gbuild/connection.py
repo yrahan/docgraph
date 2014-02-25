@@ -52,7 +52,8 @@ for source in filenames:
 
 for n in node_list:
     node = G.get_node(n.name)
-    for child in n.children:
+    for c in n.children:
+        child = G.get_node(c.name)
         G.add_edge(node, child)
 # setting layout
 G.layout(prog='dot')
