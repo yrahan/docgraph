@@ -18,7 +18,7 @@ def connect(s):
     for child in children:
         child.connect_to_parent(s)
     for parent in parents:
-        parent.connect_to_parent(s)
+        parent.connect_to_child(s)
 # get list of sources in input directory
 filenames = [f for f in os.listdir(inputpath) if not(f.endswith(".txt"))]
 
