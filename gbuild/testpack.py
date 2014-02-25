@@ -50,20 +50,24 @@ with open(os.path.join(inputpath, 'data_list.txt'), 'w') as f:
         f.write(data + '\n')
 
 # create app, job and source file sets
-size = (6, 6)
+size = (4, 4)
 name_base = 'source'
 create_file_set(size, inputpath, name_base)
 
 
 # make valid conection
 # data -> source
-connect_data_to_source('3', '52', 'r')
-connect_data_to_source('3', '15', 'w')
-connect_data_to_source('2', '33', 'w')
-connect_data_to_source('9', '32', 'r')
+connect_data_to_source('1', '12', 'r')
+connect_data_to_source('1', '22', 'w')
+connect_data_to_source('2', '02', 'r')
+connect_data_to_source('2', '11', 'w')
 # source -> source
-connect_source_to_source('52', '41')
-connect_source_to_source('52', '43')
-connect_source_to_source('43', '33')
-connect_source_to_source('33', '15')
-connect_source_to_source('43', '15')
+connect_source_to_source('03', '13')
+connect_source_to_source('23', '32')
+connect_source_to_source('12', '23')
+connect_source_to_source('22', '31')
+connect_source_to_source('20', '31')
+connect_source_to_source('11', '22')
+connect_source_to_source('11', '20')
+connect_source_to_source('02', '12')
+connect_source_to_source('02', '11')
