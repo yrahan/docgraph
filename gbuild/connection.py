@@ -1,39 +1,67 @@
 import os
 import pygraphviz as pgv
 
-from config import inputpath, outputpath  # , db_names
+from config import inputpath, outputpath, data_list
+from sources import Node
 
-# get list of files in input directory
-filenames = [f for f in os.listdir(inputpath) if f.endswith("txt")]
-filenames.remove("db.txt")
+
+def connect(s):
+    content = lines[s.name]
+    runs = [line.split() for line in content if "run" in line]
+    uses = [line.split() for line in content if "use" in line]
+    alters = [line.split() for line in content if "alter" in line]
+    print content, runs, uses, alters
+    children = [next(node for node in node_list if node.name == word[1])
+                for word in runs + alters]
+    parents = [next(node for node in node_list if node.name == word[1])
+               for word in uses]
+    for child in children:
+        child.connect_to_parent(s)
+    for parent in parents:
+        parent.connect_to_parent(s)
+# get list of sources in input directory
+filenames = [f for f in os.listdir(inputpath) if not(f.endswith(".txt"))]
+
 # getting the lines of the files
 lines = {}
 for name in filenames:
     with open(os.path.join(inputpath, name), 'r') as f:
-        lines[name.replace('.txt', '')] = f.read().splitlines()
-# loading informations into dictionnaries
-filenames = [f.replace('.txt', '') for f in filenames]
-procs = [n for n in filenames if 'proc' in n]
-jobs = [n for n in filenames if 'job' in n]
-apps = [n for n in filenames if 'app' in n]
-print lines
+        lines[name] = f.read().splitlines()
+#  creating instances of source and storing them into node_list
+
+node_list = [Node(n) for n in filenames + data_list]
+
+# adding nodes
+
+#G.add_node(child)
+for s in node_list:
+    if not s.is_data():
+        connect(s)
+
 # generating the dot file
 G = pgv.AGraph(stric=False, directed=True)
-# adding nodes
-# entry point = proc52
-child = 'proc52'
-procs.remove(child)
-G.add_node(child)
-for p in procs:
-    if any(child in line for line in lines[p]):
 
+# Graph name
+G.graph_attr['label'] = "Test pack automatic documentation"
 
-   G.add_node(p)
+# trasposing connections into the graph
+for data in data_list:
+    G.add_node(data, color='green', shape='circle')
+for source in filenames:
+    G.add_node(source, color='red', shape='box')
+
+for n in node_list:
+    node = G.get_node(n.name)
+    for child in n.children:
+        G.add_edge(node, child)
 # setting layout
 G.layout(prog='dot')
+
 # saving dot file
 G.write(os.path.join(outputpath, 'graph.dot'))
+
 # drawing
+
 # G.draw(os.path.join(outputpath, 'graph.png'))
 G.draw(os.path.join(outputpath, 'graph.ps'))
 G.draw(os.path.join(outputpath, 'graph.png'))

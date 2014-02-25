@@ -1,14 +1,17 @@
 import os
 
-from config import inputpath, datanames
+from config import inputpath, data_list
 
 
 # make valid conection
-def connect_data_to_source(data_id, source_id):
+def connect_data_to_source(data_id, source_id, mode):
     data = 'data.' + data_id
     source = 'source.' + source_id
     with open(os.path.join(inputpath, source), 'a') as f:
-        f.write('use ' + data + '\n')
+        if mode == 'w':
+            f.write('alter ' + data + '\n')
+        else:
+            f.write('use ' + data + '\n')
 
 
 def connect_source_to_source(source1_id, source2_id):
@@ -43,7 +46,7 @@ def create_file_set(size, inputpath, name_base):
 erase_folder_s_files(inputpath)
 # write list into a text file
 with open(os.path.join(inputpath, 'data_list.txt'), 'w') as f:
-    for data in datanames:
+    for data in data_list:
         f.write(data + '\n')
 
 # create app, job and source file sets
@@ -54,10 +57,10 @@ create_file_set(size, inputpath, name_base)
 
 # make valid conection
 # data -> source
-connect_data_to_source('3', '52')
-connect_data_to_source('3', '15')
-connect_data_to_source('2', '33')
-connect_data_to_source('9', '32')
+connect_data_to_source('3', '52', 'r')
+connect_data_to_source('3', '15', 'w')
+connect_data_to_source('2', '33', 'w')
+connect_data_to_source('9', '32', 'r')
 # source -> source
 connect_source_to_source('52', '41')
 connect_source_to_source('52', '43')
