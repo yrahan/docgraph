@@ -7,6 +7,5 @@ inputpath = os.path.abspath(os.path.join(
 outputpath = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', 'output'))
 # create data_listbase list
-data_list = []
-for i in range(3):
-    data_list.append("{}.{}".format("data", i))
+with open(os.path.join(inputpath, 'data_list.txt'), 'r') as f:
+    data_list = f.read().splitlines()

@@ -1,13 +1,19 @@
 from config import data_list
 
 
+# for the futur, it might be better to also have
+# a ConnectedGraph class and transfer some of the methodes and attributes
+# from Node to ConnectedGraph
 class Node(object):
+    """Class for nodes of a graph.
+
+    Instances of this class can be code source or ressources (data)
+    """
 
     def __init__(self, name):
         self.name = name
         self.parents = []
         self.children = []
-        self.used_data = []
 
     def is_child_of(self, node):
         return node.name in self.parents
