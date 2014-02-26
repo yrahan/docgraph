@@ -6,6 +6,14 @@ from sources import Node
 
 
 def connect(s):
+    """
+    Connect source node s to source nodes and data nodes.
+
+    A line containing :
+        - run source, makes source node as child
+        - use data, makes data node as child
+        - alter data, makes data node as parent
+    """
     content = lines[s.name]
     runs = [line.split() for line in content if "run" in line]
     uses = [line.split() for line in content if "use" in line]
@@ -19,42 +27,44 @@ def connect(s):
         child.connect_to_parent(s)
     for parent in parents:
         parent.connect_to_child(s)
+
 # get list of sources in input directory
 filenames = [f for f in os.listdir(inputpath) if not(f.endswith(".txt"))]
 
-# getting the lines of the files
+# read files' lines
 lines = {}
 for name in filenames:
     with open(os.path.join(inputpath, name), 'r') as f:
         lines[name] = f.read().splitlines()
-#  creating instances of source and storing them into node_list
 
+# create source and data node objects and storing them into node_list
 node_list = [Node(n) for n in filenames + data_list]
 
-# adding nodes
-
-#G.add_node(child)
+# connect the nodes by updating the attributes
 for s in node_list:
     if not s.is_data():
         connect(s)
 
-# generating the dot file
+# create the graph
 G = pgv.AGraph(stric=False, directed=True)
 
-# Graph name
+# name graph
 G.graph_attr['label'] = "Test pack automatic documentation"
 
-# trasposing connections into the graph
+# copy the node and their connections to the graph
+# add data nodes to the graph
 for data in data_list:
     G.add_node(data, color='green', shape='circle')
+# add source nodes to the graph
 for source in filenames:
     G.add_node(source, color='red', shape='box')
-
+# make the edges
 for n in node_list:
     node = G.get_node(n.name)
     for c in n.children:
         child = G.get_node(c.name)
         G.add_edge(node, child)
+
 # setting layout
 G.layout(prog='dot')
 
@@ -62,7 +72,5 @@ G.layout(prog='dot')
 G.write(os.path.join(outputpath, 'graph.dot'))
 
 # drawing
-
-# G.draw(os.path.join(outputpath, 'graph.png'))
 G.draw(os.path.join(outputpath, 'graph.ps'))
 G.draw(os.path.join(outputpath, 'graph.png'))
