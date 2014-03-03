@@ -1,6 +1,6 @@
 import os
 
-from config import inputpath, outputpath, data_list
+from config import inputpath, outputpath
 
 
 def prepare_io_folders(folders_list):
@@ -74,6 +74,7 @@ prepare_io_folders([inputpath, outputpath])
 erase_folder_s_files(inputpath)
 
 # save ressource names.
+data_list = ["data.{}".format(i) for i in range(3)]
 name_base = 'data_list.txt'
 create_data_list_file(data_list, inputpath, name_base)
 

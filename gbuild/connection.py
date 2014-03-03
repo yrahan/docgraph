@@ -1,8 +1,12 @@
 import os
 import pygraphviz as pgv
 
-from config import inputpath, outputpath, data_list
+from config import inputpath, outputpath
 from sources import Node
+
+# initialize list of sources and ressources
+node_list = []
+data_list = []
 
 
 def connect(s):
@@ -13,16 +17,32 @@ def connect(s):
         - run source, makes source node as child
         - use data, makes data node as child
         - alter data, makes data node as parent
+        - fill in the data_list
     """
+    global node_list
+    global data_list
+    # get content of source file s
     content = lines[s.name]
+    # get informations about s launching another source file
     runs = [line.split() for line in content if "run" in line]
+    # get informations about s reading a data
     uses = [line.split() for line in content if "use" in line]
+    # get information about s modifying a data
     alters = [line.split() for line in content if "alter" in line]
     print content, runs, uses, alters
+    # create data node if not exists
+    for words in (uses + alters):
+        dataname = words[1]
+        if not dataname in data_list:
+            data_list.append(dataname)
+            node_list.append(Node(dataname, True))
+    # define nodes to be children
     children = [next(node for node in node_list if node.name == word[1])
                 for word in runs + alters]
+    # define node to be parents
     parents = [next(node for node in node_list if node.name == word[1])
                for word in uses]
+    # make connections
     for child in children:
         child.connect_to_parent(s)
     for parent in parents:
@@ -37,14 +57,11 @@ for name in filenames:
     with open(os.path.join(inputpath, name), 'r') as f:
         lines[name] = f.read().splitlines()
 
-# create source and data node objects and storing them into node_list
-node_list = [Node(n) for n in filenames + data_list]
-
+node_list = [Node(f, False) for f in filenames]
 # connect the nodes by updating the attributes
 for s in node_list:
-    if not s.is_data():
+    if s.is_source:
         connect(s)
-
 # create the graph
 G = pgv.AGraph(stric=False, directed=True)
 
@@ -64,7 +81,10 @@ for n in node_list:
     for c in n.children:
         child = G.get_node(c.name)
         G.add_edge(node, child)
-
+# save data_list as file
+with open(os.path.join(outputpath, 'data_connected.txt'), 'w') as f:
+    for dataname in data_list:
+        f.write(dataname + '\n')
 # setting layout
 G.layout(prog='dot')
 
