@@ -1,7 +1,10 @@
+# import sys
 import os
 import pygraphviz as pgv
 
 from config import inputpath, outputpath
+from config import patterns
+from config import NodeType
 from sources import Node
 
 # initialize list of sources and ressources
@@ -9,7 +12,79 @@ node_list = []
 data_list = []
 
 
-def connect(s):
+def getFileList(inputpath):
+    return [f for f in os.listdir(inputpath) if not(f.endswith(".txt"))]
+
+
+def loadFiles(inputpath, filenames):
+    lines = {}
+    for name in filenames:
+        with open(os.path.join(inputpath, name), 'r') as f:
+            lines[name] = f.read().splitlines()
+    return lines
+
+
+def getNodeType(lines, filename):
+    # check if file not empty
+    if lines[filename]:
+        firstLine = lines[filename][0]
+        if patterns['fexBeginEndComments'].search(firstLine):
+            return NodeType.fex
+        elif patterns['jclLine1'].search(firstLine):
+            return NodeType.jcl
+        else:
+            return NodeType.other
+    else:
+        return NodeType.other
+
+
+def getJclRuns(content):
+    runs = []
+    for line in content:
+        if patterns['jclRunFex'].search(line):
+            runs.append(patterns['jclRunFex'].search(line).group(1))
+    return runs
+
+
+def getFexInputs(content):
+    uses = []
+    # to rewrite using iterator ? generator ?
+    while True:
+        try:
+            i = iter(content)
+            line = i.next()
+            while (not patterns['fexInputTag'].search(line)):
+                line = i.next()
+            uses.append(patterns['fexInputTag'].search(line).group(1))
+            line = i.next()
+            while (patterns['fexAddIO'].search(line)):
+                uses.append(patterns['fexAddIO'].search(line).group(1))
+                line = i.next()
+            raise StopIteration
+        except StopIteration:
+            return uses
+
+
+def getFexOutputs(content):
+    alters = []
+    # to rewrite using iterator ? generator ?
+    while True:
+        try:
+            i = iter(content)
+            line = i.next()
+            while (not patterns['fexOutputTag'].search(line)):
+                line = i.next()
+            alters.append(patterns['fexOutputTag'].search(line).group(1))
+            line = i.next()
+            while (patterns['fexAddIO'].search(line)):
+                alters.append(patterns['fexAddIO'].search(line).group(1))
+                line = i.next()
+            raise StopIteration
+        except StopIteration:
+            return alters
+
+
+def connect(lines, s):
     """
     Connect source node s to source nodes and data nodes.
 
@@ -21,47 +96,51 @@ def connect(s):
     """
     global node_list
     global data_list
+    runs = []
+    uses = []
+    alters = []
     # get content of source file s
     content = lines[s.name]
-    # get informations about s launching another source file
-    runs = [line.split() for line in content if "run" in line]
-    # get informations about s reading a data
-    uses = [line.split() for line in content if "use" in line]
-    # get information about s modifying a data
-    alters = [line.split() for line in content if "alter" in line]
-    print content, runs, uses, alters
+    # get file type
+    if s.ftype == NodeType.jcl:
+        runs = getJclRuns(content)
+    elif s.ftype == NodeType.fex:
+        uses = getFexInputs(content)
+        alters = getFexOutputs(content)
+    else:
+        return None
+    print runs, uses, alters
     # create data node if not exists
-    for words in (uses + alters):
-        dataname = words[1]
+    for dataname in (uses + alters):
         if not dataname in data_list:
             data_list.append(dataname)
-            node_list.append(Node(dataname, True))
+            node_list.append(Node(dataname, NodeType.data))
     # define nodes to be children
-    children = [next(node for node in node_list if node.name == word[1])
-                for word in runs + alters]
+    children = [next(node for node in node_list if node.name == child)
+                for child in runs + alters]
     # define node to be parents
-    parents = [next(node for node in node_list if node.name == word[1])
-               for word in uses]
+    parents = [next(node for node in node_list if node.name == parent)
+               for parent in uses]
     # make connections
     for child in children:
         child.connect_to_parent(s)
     for parent in parents:
         parent.connect_to_child(s)
 
+
 # get list of sources in input directory
-filenames = [f for f in os.listdir(inputpath) if not(f.endswith(".txt"))]
-
+filenames = getFileList(inputpath)
 # read files' lines
-lines = {}
-for name in filenames:
-    with open(os.path.join(inputpath, name), 'r') as f:
-        lines[name] = f.read().splitlines()
-
-node_list = [Node(f, False) for f in filenames]
+lines = loadFiles(inputpath, filenames)
+# build Nodes for jcl and fex files
+node_list = [Node(f, getNodeType(lines, f)) for f in filenames]
 # connect the nodes by updating the attributes
-for s in node_list:
-    if s.is_source:
-        connect(s)
+for source in node_list:
+    print source.name
+    if source.name not in data_list:
+        connect(lines, source)
+
+#sys.exit()
 # create the graph
 G = pgv.AGraph(stric=False, directed=True)
 

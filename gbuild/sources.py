@@ -1,20 +1,14 @@
-# for the futur, it might be better to also have
-# a ConnectedGraph class and transfer some of the methodes and attributes
-# from Node to ConnectedGraph
-
-
 class Node(object):
     """Class for nodes of a graph.
 
     Instances of this class can be code source or ressources (data)
     """
 
-    def __init__(self, name, is_data):
+    def __init__(self, name, ftype):
         self.name = name
         self.parents = []
         self.children = []
-        self.is_data = is_data
-        self.is_source = not self.is_data
+        self.ftype = ftype
 
     def is_child_of(self, node):
         return node.name in self.parents
