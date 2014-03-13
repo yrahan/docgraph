@@ -10,6 +10,7 @@ from sources import Node
 # initialize list of sources and ressources
 node_list = []
 data_list = []
+app_list = []
 
 
 def getFileList(inputpath):
@@ -44,6 +45,15 @@ def getJclRuns(content):
         if patterns['jclRunFex'].search(line):
             runs.append(patterns['jclRunFex'].search(line).group(1))
     return runs
+
+
+def getJclApps(content):
+    apps = []
+    line = content[0]
+    print ">>", line
+    if patterns['jclApp'].search(line):
+            apps.append(patterns['jclApp'].search(line).group(1))
+    return apps
 
 
 def getFexInputs(content):
@@ -99,17 +109,25 @@ def connect(lines, s):
     runs = []
     uses = []
     alters = []
+    apps = []
     # get content of source file s
     content = lines[s.name]
     # get file type
     if s.ftype == NodeType.jcl:
         runs = getJclRuns(content)
+        apps = getJclApps(content)
+        print "===========>", apps
     elif s.ftype == NodeType.fex:
         uses = getFexInputs(content)
         alters = getFexOutputs(content)
     else:
         return None
-    print runs, uses, alters
+    print runs, uses, alters, apps
+    # create app if not exists
+    for app in apps:
+        if not app in app_list:
+            app_list.append(app)
+            node_list.append(Node(app, NodeType.app))
     # create data node if not exists
     for dataname in (uses + alters):
         if not dataname in data_list:
@@ -120,7 +138,7 @@ def connect(lines, s):
                 for child in runs + alters]
     # define node to be parents
     parents = [next(node for node in node_list if node.name == parent)
-               for parent in uses]
+               for parent in uses + apps]
     # make connections
     for child in children:
         child.connect_to_parent(s)
@@ -137,7 +155,7 @@ node_list = [Node(f, getNodeType(lines, f)) for f in filenames]
 # connect the nodes by updating the attributes
 for source in node_list:
     print source.name
-    if source.name not in data_list:
+    if source.name not in (data_list + app_list):
         connect(lines, source)
 
 #sys.exit()
@@ -150,10 +168,13 @@ G.graph_attr['label'] = "Test pack automatic documentation"
 # copy the node and their connections to the graph
 # add data nodes to the graph
 for data in data_list:
-    G.add_node(data, color='green', shape='circle')
+    G.add_node(data, color='green', shape='box')
 # add source nodes to the graph
 for source in filenames:
-    G.add_node(source, color='red', shape='box')
+    G.add_node(source, color='red', shape='circle')
+# add source nodes to the graph
+for app in app_list:
+    G.add_node(app, color='blue', shape='circle')
 # make the edges
 for n in node_list:
     node = G.get_node(n.name)
