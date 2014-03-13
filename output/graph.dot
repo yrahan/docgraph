@@ -10,18 +10,18 @@ strict digraph {
 		pos="652.2,292",
 		shape=box,
 		width="1.3611"];
-	COMSPD5P	 [color=red,
-		height="1.9028",
-		pos="652.2,168",
-		shape=circle,
-		width="1.8889"];
-	COMACH1B -> COMSPD5P	 [pos="e,652.2,236.63 652.2,273.97 652.2,266.36 652.2,256.94 652.2,246.87"];
 	COMACH4S	 [color=red,
 		height="1.9306",
 		pos="905.2,168",
 		shape=circle,
 		width="1.9167"];
 	COMACH1B -> COMACH4S	 [pos="e,842.9,198.53 688.99,273.97 726.76,255.46 786.52,226.17 833.65,203.07"];
+	COMSPD5P	 [color=red,
+		height="1.9028",
+		pos="652.2,168",
+		shape=circle,
+		width="1.8889"];
+	COMACH1B -> COMSPD5P	 [pos="e,652.2,236.63 652.2,273.97 652.2,266.36 652.2,256.94 652.2,246.87"];
 	COMACH2B	 [color=green,
 		height="0.5",
 		pos="652.2,44",
@@ -39,9 +39,9 @@ strict digraph {
 		pos="1201.2,579",
 		shape=box,
 		width="1.1389"];
+	DMQORG -> COMACH4S	 [pos="e,945.84,224.43 1188.1,560.81 1147.3,504.13 1021,328.75 951.75,232.63"];
 	DMQORG -> COMSPD5P	 [pos="e,698.73,218.07 1190,560.8 1181,547.68 1167.3,530.5 1151.2,520 1104.2,489.32 107\
 9.6,510.54 1030.2,484 900.77,414.51 774.88,296.04 706.03,225.58"];
-	DMQORG -> COMACH4S	 [pos="e,945.84,224.43 1188.1,560.81 1147.3,504.13 1021,328.75 951.75,232.63"];
 	COMSPD4P	 [color=red,
 		height="1.9028",
 		pos="643.2,415",
